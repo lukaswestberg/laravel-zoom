@@ -36,6 +36,12 @@ class Entry extends ApiEntry
 
     protected $allowedOperands = ['='];
 
+    protected $accountId = null;
+    
+    protected $clientId = null;
+
+    protected $clientSecret = null;
+
     /**
      * Entry constructor.
      * @param $apiKey
@@ -51,6 +57,10 @@ class Entry extends ApiEntry
         $this->tokenLife = $tokenLife ? $tokenLife : config('zoom.token_life');
         $this->maxQueries = $maxQueries ? $maxQueries : (config('zoom.max_api_calls_per_request') ? config('zoom.max_api_calls_per_request') : $this->maxQueries);
         $this->baseUrl = $baseUrl ? $baseUrl : config('zoom.base_url');
+
+        $this->accountId = config('zoom.account_id');
+        $this->clientId = config('zoom.client_id');
+        $this->clientSecret = config('zoom.client_secret');
     }
 
     public function newRequest()
@@ -58,6 +68,8 @@ class Entry extends ApiEntry
         if (config('zoom.authentication_method') == 'jwt') {
             return $this->jwtRequest();
         } elseif (config('zoom.authentication_method') == 'oauth2') {
+        } else if(config('zoom.authentication_method') == 'server-to-server-oauth') {
+            return $this->serverToServerOauthRequest();
         }
     }
 
@@ -70,5 +82,25 @@ class Entry extends ApiEntry
 
     public function oauth2Request()
     {
+    }
+
+    public function serverToServerOauthRequest()
+    {
+        $authResponse = cache()->remember('macsidigital_zoom_auth_response', 3600, function () {
+            $client = new \GuzzleHttp\Client();
+
+            $response = $client->request('POST', 'https://zoom.us/oauth/token', [
+                'form_params' => [
+                    'grant_type' => 'account_credentials',
+                    'account_id' => $this->accountId,
+                ],
+                'headers' => [
+                    'Authorization' => 'Basic '.base64_encode($this->clientId.':'.$this->clientSecret),
+                ],
+            ]);
+            return json_decode($response->getBody()->getContents());
+        });
+
+        return Client::baseUrl($this->baseUrl)->withToken($authResponse->access_token);
     }
 }
