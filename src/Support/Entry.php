@@ -86,21 +86,32 @@ class Entry extends ApiEntry
 
     public function serverToServerOauthRequest()
     {
-        $authResponse = cache()->remember('macsidigital_zoom_auth_response', 3600, function () {
-            $client = new \GuzzleHttp\Client();
+        $oauthToken =  $this->OAuthGenerateToken();
+        $cached = config('zoom.cache_token', true) ? \Cache::get('zoom_oauth_token') : null;
+        $oauthToken = !is_null($cached) ? $cached : $this->OAuthGenerateToken();
 
-            $response = $client->request('POST', 'https://zoom.us/oauth/token', [
-                'form_params' => [
-                    'grant_type' => 'account_credentials',
-                    'account_id' => $this->accountId,
-                ],
-                'headers' => [
-                    'Authorization' => 'Basic '.base64_encode($this->clientId.':'.$this->clientSecret),
-                ],
+        return Client::baseUrl($this->baseUrl)->withToken($oauthToken);
+    }
+
+    private function OAuthGenerateToken(){
+
+        $response = \Illuminate\Support\Facades\Http::asForm()
+            ->withHeaders([
+                'Authorization' => ['Basic '.base64_encode("$this->clientId:$this->clientSecret")]
+            ])->post('https://zoom.us/oauth/token', [
+                'grant_type' => 'account_credentials',
+                'account_id' => $this->accountId,
             ]);
-            return json_decode($response->getBody()->getContents());
-        });
 
-        return Client::baseUrl($this->baseUrl)->withToken($authResponse->access_token);
+        if ($response->status() != 200) {
+            throw new \ErrorException( $response['error']);
+        }
+
+        if(config('zoom.cache_token', true)) {
+            // -10 seconds TTL just-in-case...
+            cache(['zoom_oauth_token' => $response['access_token']], now()->addSeconds($response['expires_in'] - 10));
+        }
+
+        return $response['access_token'];
     }
 }
