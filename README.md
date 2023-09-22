@@ -45,6 +45,12 @@ php artisan vendor:publish --provider="MacsiDigital\Zoom\Providers\ZoomServicePr
 'cache_token' => env('ZOOM_CACHE_TOKEN', true),
 ```
 
+### You also need to change the `authentication_method` configuration value in config/zoom.php
+
+```php
+'authentication_method' => 'server-to-server-oauth'
+```
+
 ### Done!
 
 ## Original README.md
