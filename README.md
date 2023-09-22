@@ -1,5 +1,54 @@
 # Laravel Zoom
 
+### Custom fork to continue support for php^7.3
+
+### To use this package add this to your composer.json
+
+```json
+    "repositories": [
+        {
+          "type": "vcs",
+          "url": "https://github.com/lukaswestberg/laravel-zoom.git"
+        }
+    ],
+    "require": {
+        "lukaswestberg/laravel-zoom": "dev-php7-update-branch",
+    }
+```
+
+### Then run
+
+```bash
+composer update
+```
+
+### Then add this to your .env file
+
+```env
+ZOOM_ACCOUNT_ID=YOUR_ZOOM_ACCOUNT_ID
+ZOOM_CLIENT_ID=YOUR_ZOOM_CLIENT_ID
+ZOOM_CLIENT_SECRET=YOUR_ZOOM_CLIENT_SECRET
+```
+
+### Then run
+
+```bash
+php artisan vendor:publish --provider="MacsiDigital\Zoom\Providers\ZoomServiceProvider"
+```
+
+### Then add this to your config/zoom.php file
+
+```php
+'account_id' => env('ZOOM_ACCOUNT_ID'),
+'client_id' => env('ZOOM_CLIENT_ID'),
+'client_secret' => env('ZOOM_CLIENT_SECRET'),
+'cache_token' => env('ZOOM_CACHE_TOKEN', true),
+```
+
+### Done!
+
+## Original README.md
+
 ## Laravel Zoom API Client
 
 ![Header Image](https://github.com/MacsiDigital/repo-design/raw/master/laravel-zoom/header.png)
