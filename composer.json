@@ -1,7 +1,7 @@
 {
-    "name": "macsidigital/laravel-zoom",
+    "name": "lukaswestberg/laravel-zoom",
     "description": "Laravel Zoom package",
-    "homepage": "https://github.com/MacsiDigital/laravel-zoom",
+    "homepage": "https://github.com/lukaswestberg/laravel-zoom",
     "keywords": [
         "macsidigital",
         "laravel-zoom",
@@ -16,6 +16,11 @@
         {
             "name": "Colin Hall",
             "email": "colin@macsi.co.uk",
+            "role": "Developer"
+        },
+        {
+            "name": "Lukas Westberg",
+            "email": "lukas.westberg@gmail.com",
             "role": "Developer"
         }
     ],
