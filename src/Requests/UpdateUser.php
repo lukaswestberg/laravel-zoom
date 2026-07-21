@@ -9,7 +9,7 @@ class UpdateUser extends PersistResource
     protected $persistAttributes = [
         'first_name' => 'nullable|string|max:64',
         'last_name' => 'nullable|string|max:64',
-        'type' => 'nullable|in:1,2,3',
+        'type' => 'nullable|in:1,2,3,4,99',
         'pmi' => 'nullable|size:10',
         'use_pmi' => 'nullable|boolean',
         'timezone' => '',
